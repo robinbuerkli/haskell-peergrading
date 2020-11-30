@@ -18,6 +18,8 @@ main = do
     get "/" indexHtml
     get "/authors" authorOverviewHtml
     get "/authors/:author" authorHtml
+    get "/grade" gradeFormHtml
+    post "grade" gradeFormHandling
 
     get "/static/styles.css" $ file "static/styles.css"
 
@@ -33,9 +35,20 @@ authorOverviewHtml = do
 
 criteria = ["N1", "N2", "F1", "F2", "F3"]
 
+formInputs = concat [["Author", "Grader"], criteria]
+
 authorHtml :: ActionM ()
 authorHtml =  do
               author <- param "author"
               graders <- liftIO (listGraders author)
               gradings <- liftIO (getGradingsForAuthor author)
               html (T.pack (HTML.createPage ("<h1>Author: " ++ author ++ "</h1>" ++ "<table><tr>" ++ HTML.th ([]:criteria) ++ "<tr>" ++ buildGraderRows (map getFileName graders) gradings  ++  "</table>" )))
+
+gradeFormHtml :: ActionM ()
+gradeFormHtml =   do
+                  html (T.pack (HTML.createPage ("<h1>Grade</h1>" ++ "<form method=\"post\">" ++ ((concatMap (\i -> HTML.labeledInput i ++ "<br />") formInputs)) ++ "<button type=\"submit\">Send</button></form>")))
+
+
+gradeFormHandling :: ActionM()
+gradeFormHandling = do
+                    html (T.pack ("imlement this"))

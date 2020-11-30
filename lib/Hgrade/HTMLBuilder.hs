@@ -10,6 +10,7 @@ createPage content = unlines [
   "<!doctype html>",
   "<html lang='en'>",
   "  <head>",
+  "      <title>fprog - Peergrading in Haskell</title>",
   "      <link rel=\"stylesheet\" type=\"text/css\" href=\"/static/styles.css\">",
   " </head>",
   "  <body>" ++ content ++ "</body>",
@@ -39,7 +40,11 @@ td[] = ""
 td [s] = "<td>" ++ (show s) ++ "</td>"
 td (s:ss) = "<td>" ++ (show s) ++ "</td>" ++ td ss
 
+labeledInput :: String -> String
+labeledInput name = "<label for=\"" ++ name ++"\">" ++ name ++ ": </label><input type=\"text\" name=\"" ++ name ++ "\" />"
+
 buildGraderRows :: [String] -> [[Int]] -> String
 buildGraderRows [] _ = ""
 buildGraderRows (_:_) [] = ""
 buildGraderRows (x:xs) (g: gs) = tr [("<td>" ++ x ++ "</td>" ++ td g)] ++ buildGraderRows xs gs
+
