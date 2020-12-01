@@ -19,7 +19,12 @@ calculateMedians :: [[Int]] -> [Double]
 calculateMedians [] = []
 calculateMedians (x:xs) = (median (sort x)) : calculateMedians xs
 
--- calculateMedians [[0,2,0,2],[2,1,1,1],[2,1,0,0],[2,1,2,1],[2,1,1,1]]
-
 doubleToStringList :: [Double] -> [String]
 doubleToStringList xs = map (\d -> show d) xs
+
+histogram :: [Int] -> (Int, Int, Int)
+histogram col = (countPerPoints 0 col, countPerPoints 1 col, countPerPoints 2 col)
+
+countPerPoints :: Int -> [Int] -> Int
+countPerPoints e [] = 0
+countPerPoints e grading = length (filter (\x -> e == x) grading)

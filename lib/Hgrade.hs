@@ -35,7 +35,6 @@ authorOverviewHtml = do
 
 
 criteria = ["N1", "N2", "F1", "F2", "F3"]
-
 formInputs = concat [["Author", "Grader"], criteria]
 
 
@@ -44,7 +43,7 @@ authorHtml =  do
               author <- param "author"
               graders <- liftIO (listGraders author)
               gradings <- liftIO (getGradingsForAuthor author)
-              html (T.pack (HTML.createPage ("<h1>Author: " ++ author ++ "</h1>" ++ "<table><tr>" ++ HTML.th ([]:criteria)  ++ buildGraderRows (map getFileName graders) gradings ++ buildMedianRow (calculateMedians (colsToRows gradings))  ++ "</table>" )))
+              html (T.pack (HTML.createPage ("<h1>Author: " ++ author ++ "</h1>" ++ "<table><tr>" ++ HTML.th ([]:criteria)  ++ buildGraderRows (map getFileName graders) gradings ++ buildMedianRow (calculateMedians (colsToRows gradings))  ++ buildHistogramRow (length graders) (colsToRows gradings) ++ "</table>" )))
 
 
 gradeFormHtml :: ActionM ()

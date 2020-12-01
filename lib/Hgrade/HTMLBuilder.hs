@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wall #-}
 module Hgrade.HTMLBuilder where
 
 import Control.Monad (mapM, replicateM, forM_, filterM)
@@ -54,3 +55,19 @@ buildGraderRows (x:xs) (g: gs) = tr [("<td>" ++ x ++ "</td>" ++ td g)] ++ buildG
 
 buildMedianRow :: [Double] -> String
 buildMedianRow xs = tr ["<td>Median</td>" ++ concatMap(\d -> td ([d])) xs]
+
+buildHistogramRow :: Int -> [[Int]]  -> String
+buildHistogramRow n xs = tr ["<td>Histograms</td>" ++ concatMap(\d -> "<td>" ++ (buildHistogramTable n d) ++ "</td>") xs]
+
+buildHistogramTable :: Int -> [Int] -> String
+buildHistogramTable _ [] = ""
+buildHistogramTable n xs = "<table class='histo'>" ++ (buildHistogramRows n (histogram xs)) ++ "</table>"
+
+buildHistogramRows :: Int -> (Int, Int, Int) -> String
+buildHistogramRows 0 _ = ""
+buildHistogramRows n (fst, snd, trd) = tr[(tdColor n fst ++ tdColor n snd ++ tdColor n trd)] ++ (buildHistogramRows (n - 1) (fst, snd, trd))
+
+tdColor :: Int -> Int -> String
+tdColor x y
+        | x > y = "<td class='white'></td>"
+        | otherwise = "<td class='black'></td>"
