@@ -54,13 +54,10 @@ gradeFormHtml =   do
 
 gradeFormHandling :: ActionM()
 gradeFormHandling = do
-                    --grading <- mapM param (map T.pack formInputs) :: T.Text
                     inputs <- mapM (\p -> param (p :: T.Text) :: ActionM T.Text) (map (\i -> T.pack i) formInputs)
-                    html (T.pack ("Form input: " ++ (T.unpack (T.concat inputs))))
-
-
-
-
---                     request <- param ("Author" :: T.Text) :: ActionM T.Text
---                    grader <- param ("grader" :: T.Text) :: ActionM T.Text
---                    gradings <- param ("criteria" :: T.Text) :: ActionM T.Text
+                    let inputList = map(\s -> read $ show $ T.unpack s) inputs
+                    let author = inputList !! 0
+                    let grader = inputList !! 1
+                    let gradings = map (\g -> read g) (drop 2 inputList)
+                    liftIO (storeGrading author grader gradings)
+                    redirect "/authors"

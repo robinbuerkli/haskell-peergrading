@@ -37,8 +37,6 @@ getGrading author grader =  do
                             let grading = read (contents)
                             return grading
 
-
-
 getGradingsForAuthor :: String -> IO [[Int]]
 getGradingsForAuthor author =  do
                               graders <- listGraders author
@@ -46,17 +44,11 @@ getGradingsForAuthor author =  do
                               let intGrades = gradings
                               return intGrades
 
-getGradingList :: [Param] -> IO [Int]
-getGradingList params = do
-                        let gradings = readGradings params
-                        return gradings
 
-
-readGradings :: [Param] -> [Int]
-readGradings [] = []
-readGradings [(T.unpack->"Grader", _)] = []
-readGradings [(T.unpack->"Author", _)] = []
-readGradings ^((key, val): xs) = [val] ++ readGradings xs
-
-
-
+storeGrading :: String -> String -> [Int] -> IO ()
+storeGrading author grader gradings = do
+                                      curDir <- getCurrentDirectory
+                                      createDirectoryIfMissing True (curDir ++ "/data/" ++ author)
+                                      let file = (curDir ++ "/data/" ++ author ++ "/" ++ grader ++  ".txt")
+                                      writeFile file (show gradings)
+                                      return ()
