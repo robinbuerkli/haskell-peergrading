@@ -19,7 +19,7 @@ common common-properties
 
 library
   import:              common-properties
-  exposed-modules:     Hgrade, Hgrade.FSActions, Hgrade.HTMLBuilder
+  exposed-modules:     Hgrade, Hgrade.FSActions, Hgrade.HTMLBuilder, Hgrade.ListFunctions
   -- other-modules:
   -- other-extensions:
   build-depends:       

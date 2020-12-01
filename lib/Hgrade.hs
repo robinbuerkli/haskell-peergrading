@@ -7,6 +7,7 @@ import           Control.Monad.IO.Class (liftIO)
 import           Network.Wai.Middleware.RequestLogger ( logStdoutDev )
 import qualified Data.Text.Lazy as T
 import           Hgrade.FSActions
+import           Hgrade.ListFunctions
 import           Hgrade.HTMLBuilder as HTML
 
 main :: IO ()
@@ -37,18 +38,31 @@ criteria = ["N1", "N2", "F1", "F2", "F3"]
 
 formInputs = concat [["Author", "Grader"], criteria]
 
+
 authorHtml :: ActionM ()
 authorHtml =  do
               author <- param "author"
               graders <- liftIO (listGraders author)
               gradings <- liftIO (getGradingsForAuthor author)
-              html (T.pack (HTML.createPage ("<h1>Author: " ++ author ++ "</h1>" ++ "<table><tr>" ++ HTML.th ([]:criteria) ++ "<tr>" ++ buildGraderRows (map getFileName graders) gradings  ++  "</table>" )))
+              html (T.pack (HTML.createPage ("<h1>Author: " ++ author ++ "</h1>" ++ "<table><tr>" ++ HTML.th ([]:criteria)  ++ buildGraderRows (map getFileName graders) gradings ++ buildMedianRow (calculateMedians (colsToRows gradings))  ++ "</table>" )))
+
+
+
+
 
 gradeFormHtml :: ActionM ()
 gradeFormHtml =   do
-                  html (T.pack (HTML.createPage ("<h1>Grade</h1>" ++ "<form method=\"post\">" ++ ((concatMap (\i -> HTML.labeledInput i ++ "<br />") formInputs)) ++ "<button type=\"submit\">Send</button></form>")))
+                  html (T.pack (HTML.createPage ("<h1>Grade</h1>" ++ "<form method=\"post\">" ++ (concatMap (\i -> HTML.labeledInput i ++ "<br />") formInputs) ++ "<button type=\"submit\">Send</button></form>")))
 
 
 gradeFormHandling :: ActionM()
 gradeFormHandling = do
+                    --let gradingList = liftIO (getGradingList params)
                     html (T.pack ("imlement this"))
+
+
+
+
+--                     request <- param ("Author" :: T.Text) :: ActionM T.Text
+--                    grader <- param ("grader" :: T.Text) :: ActionM T.Text
+--                    gradings <- param ("criteria" :: T.Text) :: ActionM T.Text

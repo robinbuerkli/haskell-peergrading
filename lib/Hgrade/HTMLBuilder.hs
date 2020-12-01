@@ -2,6 +2,7 @@ module Hgrade.HTMLBuilder where
 
 import Control.Monad (mapM, replicateM, forM_, filterM)
 import Data.Text (pack, Text)
+import Hgrade.ListFunctions
 import           Control.Monad.IO.Class (liftIO)
 
 
@@ -43,8 +44,13 @@ td (s:ss) = "<td>" ++ (show s) ++ "</td>" ++ td ss
 labeledInput :: String -> String
 labeledInput name = "<label for=\"" ++ name ++"\">" ++ name ++ ": </label><input type=\"text\" name=\"" ++ name ++ "\" />"
 
+criteriaInput :: String -> String
+criteriaInput name = "<label for=\"" ++ name ++"\">" ++ name ++ ": </label><input type=\"text\" name=\"criteria[" ++ name ++ "]\" />"
+
 buildGraderRows :: [String] -> [[Int]] -> String
 buildGraderRows [] _ = ""
 buildGraderRows (_:_) [] = ""
 buildGraderRows (x:xs) (g: gs) = tr [("<td>" ++ x ++ "</td>" ++ td g)] ++ buildGraderRows xs gs
 
+buildMedianRow :: [Double] -> String
+buildMedianRow xs = tr ["<td>Median</td>" ++ concatMap(\d -> td ([d])) xs]
