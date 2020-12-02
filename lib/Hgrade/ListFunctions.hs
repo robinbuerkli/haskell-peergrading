@@ -1,13 +1,12 @@
+{-# OPTIONS_GHC -Wall #-}
 module Hgrade.ListFunctions where
 
 import Data.List
 
-
 colsToRows :: [[a]] -> [[a]]
---colsToRows [[]] = []
---colsToRows [[], xs] = []
---colsToRows xs = (map head xs) : colsToRows (map tail xs)
-colsToRows = transpose
+colsToRows [] = []
+colsToRows ([]:_) = []
+colsToRows xs = (map head xs) : colsToRows (map tail xs)
 
 median :: [Int] -> Double
 median xs

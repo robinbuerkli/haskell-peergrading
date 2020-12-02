@@ -1,10 +1,8 @@
 {-# OPTIONS_GHC -Wall #-}
 module Hgrade.HTMLBuilder where
 
-import Control.Monad (mapM, replicateM, forM_, filterM)
 import Data.Text (pack, Text)
 import Hgrade.ListFunctions
-import           Control.Monad.IO.Class (liftIO)
 
 
 createPage :: String -> String

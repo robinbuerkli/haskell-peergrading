@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Hgrade where
 
@@ -11,6 +12,13 @@ import           Hgrade.ListFunctions
 import           Hgrade.HTMLBuilder as HTML
 import           Hgrade.Demo as DEMO
 import           System.Environment
+
+
+criteria :: [String]
+criteria = ["N1", "N2", "F1", "F2", "F3"]
+
+formInputs :: [String]
+formInputs = concat [["Author", "Grader"], criteria]
 
 main :: IO ()
 main = do
@@ -36,11 +44,6 @@ authorOverviewHtml :: ActionM ()
 authorOverviewHtml = do
               authors <- liftIO listAuthors
               html (T.pack (HTML.createPage "<h1>Authors</h1><ul>" ++ (HTML.ul (reverse (map (\author -> HTML.a ("authors/" ++ author) author) authors))) ++ "</ul>"))
-
-
-criteria = ["N1", "N2", "F1", "F2", "F3"]
-formInputs = concat [["Author", "Grader"], criteria]
-
 
 authorHtml :: ActionM ()
 authorHtml =  do
