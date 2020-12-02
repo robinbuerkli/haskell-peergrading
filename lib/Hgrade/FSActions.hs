@@ -9,7 +9,7 @@ import Web.Scotty
 import Control.Monad (mapM, replicateM, forM_, filterM)
 import qualified Data.Text.Lazy as T
 import Data.Text (pack, Text)
-import           Control.Monad.IO.Class (liftIO)
+import Control.Monad.IO.Class (liftIO)
 
 listAuthors :: IO [FilePath]
 listAuthors = do
@@ -48,7 +48,16 @@ getGradingsForAuthor author =  do
 storeGrading :: String -> String -> [Int] -> IO ()
 storeGrading author grader gradings = do
                                       curDir <- getCurrentDirectory
-                                      createDirectoryIfMissing True (curDir ++ "/data/" ++ author)
+                                      createAuthor author
                                       let file = (curDir ++ "/data/" ++ author ++ "/" ++ grader ++  ".txt")
                                       writeFile file (show gradings)
                                       return ()
+
+createAuthor :: String -> IO ()
+createAuthor author = do
+                      curDir <- getCurrentDirectory
+                      createDirectoryIfMissing True (curDir ++ "/data/" ++ author)
+                      return ()
+
+
+

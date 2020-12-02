@@ -9,10 +9,14 @@ import qualified Data.Text.Lazy as T
 import           Hgrade.FSActions
 import           Hgrade.ListFunctions
 import           Hgrade.HTMLBuilder as HTML
+import           Hgrade.Demo as DEMO
+import           System.Environment
 
 main :: IO ()
 main = do
-  putStrLn "Good Luck!"
+  args <- getArgs
+  do if (length args) > 0 then if ("-demo" `elem` args) then generateDemo else return () else return ()
+
   scotty 4000 $ do
     middleware logStdoutDev
     
@@ -60,3 +64,11 @@ gradeFormHandling = do
                     let gradings = map (\g -> read g) (drop 2 inputList)
                     liftIO (storeGrading author grader gradings)
                     redirect "/authors"
+
+
+generateDemo :: IO ()
+generateDemo = do
+               putStrLn "generating demo data..."
+               generateDemoData criteria
+
+
