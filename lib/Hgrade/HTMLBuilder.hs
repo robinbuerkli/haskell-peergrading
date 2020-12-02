@@ -1,7 +1,6 @@
 {-# OPTIONS_GHC -Wall #-}
 module Hgrade.HTMLBuilder where
 
-import Data.Text (pack, Text)
 import Hgrade.ListFunctions
 
 
@@ -63,7 +62,7 @@ buildHistogramTable n xs = "<table class='histo'>" ++ (buildHistogramRows n (his
 
 buildHistogramRows :: Int -> (Int, Int, Int) -> String
 buildHistogramRows 0 _ = ""
-buildHistogramRows n (fst, snd, trd) = tr[(tdColor n fst ++ tdColor n snd ++ tdColor n trd)] ++ (buildHistogramRows (n - 1) (fst, snd, trd))
+buildHistogramRows n (first, second, third) = tr[(tdColor n first ++ tdColor n second ++ tdColor n third)] ++ (buildHistogramRows (n - 1) (first, second, third))
 
 tdColor :: Int -> Int -> String
 tdColor x y

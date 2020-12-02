@@ -25,5 +25,5 @@ histogram :: [Int] -> (Int, Int, Int)
 histogram col = (countPerPoints 0 col, countPerPoints 1 col, countPerPoints 2 col)
 
 countPerPoints :: Int -> [Int] -> Int
-countPerPoints e [] = 0
+countPerPoints _ [] = 0
 countPerPoints e grading = length (filter (\x -> e == x) grading)
