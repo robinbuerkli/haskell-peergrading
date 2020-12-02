@@ -1,4 +1,9 @@
-{-# OPTIONS_GHC -Wall #-}
+{-|
+Module      : HTML Builder
+Description : This module contains functions to create html output
+
+This module contains a set of functions to create html output more easily.
+-}
 module Hgrade.HTMLBuilder where
 
 import Hgrade.ListFunctions

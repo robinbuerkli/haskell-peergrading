@@ -1,3 +1,9 @@
+{-|
+Module      : Hgrade testing module
+Description : Tests some functions of the project.
+
+Contains the tests for colsToRows, median and histogram.
+-}
 module Main (main) where
 
 import Hgrade.ListFunctions
@@ -5,12 +11,15 @@ import Data.List
 import Test.Tasty
 import Test.Tasty.HUnit
 
+-- | main entrypoint for the tests
 main :: IO ()
 main = defaultMain tests
 
+-- | define tests
 tests :: TestTree
 tests = testGroup "Unit Tests" [medianTests, histoTests, c2rTests]
 
+-- | testset for the median function
 medianTests :: TestTree
 medianTests = testGroup "Median tests"
   [ testCase "median empty list" $
@@ -26,6 +35,7 @@ medianTests = testGroup "Median tests"
           median [0,0] @?= 0
   ]
 
+-- | testset for the histogram function
 histoTests :: TestTree
 histoTests = testGroup "Histogram tests"
   [ testCase "histogram empty list" $
@@ -38,6 +48,7 @@ histoTests = testGroup "Histogram tests"
           histogram [1,0,2,1,1,0] @?= (2,3,1)
   ]
 
+-- | testset for the
 c2rTests :: TestTree
 c2rTests = testGroup "ColsToRows tests"
   [ testCase "ColsToRows empty list" $
