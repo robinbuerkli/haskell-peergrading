@@ -47,14 +47,15 @@ main = do
     get "/static/styles.css" $ file "static/styles.css"
 
 -- | homepage, which you'll get with a get request to the root
-indexHtml :: ActionM () 
-indexHtml = html (T.pack (HTML.renderPage "<h1>Hgrade</h1><h2>Peergrading in Haskell</h2><div id=\"links\"><ul><li><a href=\"./authors\">Grading Overview</a></li><li><a href=\"grade\">Submit Grading</a></li></ul></div>"))
+indexHtml :: ActionM ()
+indexHtml = html (T.pack (HTML.page [HTML.h1 "Hgrade", HTML.h2 "Peergrading in Haskell", HTML.div ["id='links']"] (HTML.ul (concat [HTML.li (HTML.a "/authors" "Grading Overview"), HTML.li (HTML.a "/grade" "Submit Grading")]))]))
 
 -- | overview of authors
 authorOverviewHtml :: ActionM ()
+
 authorOverviewHtml = do
               authors <- liftIO listAuthors
-              html (T.pack (HTML.renderPage "<h1>Authors</h1><ul>" ++ (HTML.ul (reverse (map (\author -> HTML.a ("authors/" ++ author) author) authors))) ++ "</ul>"))
+              html (T.pack (HTML.page [HTML.h1 "Authors", (HTML.ul (concatMap(\a -> HTML.li a) (map (\author -> HTML.a ("authors/" ++ author) author) (reverse authors))))]))
 
 -- | detail page of a single author
 authorHtml :: ActionM ()
@@ -62,12 +63,12 @@ authorHtml =  do
               author <- param "author"
               graders <- liftIO (listGraders author)
               gradings <- liftIO (getGradingsForAuthor author)
-              html (T.pack (HTML.renderPage ("<h1>Author: " ++ author ++ "</h1>" ++ "<table><tr>" ++ HTML.th ([]:criteria)  ++ HTML.buildGraderRows (map getFileName graders) gradings ++ HTML.buildMedianRow (calculateMedians (colsToRows gradings)) ++ HTML.buildHistogramRow (length graders) (colsToRows gradings) ++ "</table>" )))
+              html (T.pack (HTML.page [HTML.h1 (concat ["Author: ", author]), HTML.table [] (concat [(HTML.tr (concatMap (\c -> HTML.th c) ("":criteria))), (HTML.buildGraderRows (map getFileName graders) gradings), (HTML.buildMedianRow (calculateMedians (colsToRows gradings))), (HTML.buildHistogramRow (length graders) (colsToRows gradings))])]))
 
 -- | grading page that displays the form
 gradeFormHtml :: ActionM ()
 gradeFormHtml =   do
-                  html (T.pack (HTML.renderPage ("<h1>Grade</h1>" ++ "<form method=\"post\">" ++ (concatMap (\i -> HTML.labeledInput i ++ "<br />") formInputs) ++ "<button type=\"submit\">Send</button></form>")))
+                  html (T.pack (HTML.page [HTML.h1 "Grade", (HTML.form ["method='post'"] (concat [(concatMap (\i -> HTML.div ["class='formInput']"] (HTML.labeledInput i)) formInputs), (HTML.button "Send")]))]))
 
 -- | handles the post request sent by the grading form
 gradeFormHandling :: ActionM()
@@ -76,7 +77,7 @@ gradeFormHandling = do
                     inputs <- mapM (\p -> param (p :: T.Text) :: ActionM T.Text) (map (\i -> T.pack i) formInputs)
                     let inputList = map(\s -> read $ show $ T.unpack s) inputs
                     -- check if there are values
-                    if any null inputList then html (T.pack (HTML.renderPage "Incomplete input. <a href=\"/\">Beam me up, Scotty!</a>")) else do
+                    if any null inputList then html (T.pack (HTML.page [HTML.p "Incomplete input.", HTML.a "/" "Beam me up, Scotty!"])) else do
                       -- get fields that are always the same (Author & Grader)
                       let author = inputList !! 0
                       let grader = inputList !! 1
