@@ -9,15 +9,15 @@ in the project.
 -}
 module Hgrade where
 
-import           Web.Scotty
-import           Control.Monad.IO.Class (liftIO)
-import           Network.Wai.Middleware.RequestLogger ( logStdoutDev )
-import qualified Data.Text.Lazy as T
-import           Hgrade.FSActions
-import           Hgrade.ListFunctions
-import           Hgrade.HTMLBuilder as HTML
-import           Hgrade.Demo as DEMO
-import           System.Environment
+import            Web.Scotty
+import            Control.Monad.IO.Class (liftIO)
+import            Network.Wai.Middleware.RequestLogger ( logStdoutDev )
+import qualified  Data.Text.Lazy as T
+import            Hgrade.FSActions
+import            Hgrade.ListFunctions
+import qualified  Hgrade.HTMLBuilder as HTML
+import            Hgrade.Demo as DEMO
+import            System.Environment
 
 -- | list of the criteria, which the authors get graded by
 criteria :: [String]
@@ -48,13 +48,13 @@ main = do
 
 -- | homepage, which you'll get with a get request to the root
 indexHtml :: ActionM () 
-indexHtml = html (T.pack (HTML.createPage "<h1>Hgrade</h1><h2>Peergrading in Haskell</h2><div id=\"links\"><ul><li><a href=\"./authors\">Grading Overview</a></li><li><a href=\"grade\">Submit Grading</a></li></ul></div>"))
+indexHtml = html (T.pack (HTML.renderPage "<h1>Hgrade</h1><h2>Peergrading in Haskell</h2><div id=\"links\"><ul><li><a href=\"./authors\">Grading Overview</a></li><li><a href=\"grade\">Submit Grading</a></li></ul></div>"))
 
 -- | overview of authors
 authorOverviewHtml :: ActionM ()
 authorOverviewHtml = do
               authors <- liftIO listAuthors
-              html (T.pack (HTML.createPage "<h1>Authors</h1><ul>" ++ (HTML.ul (reverse (map (\author -> HTML.a ("authors/" ++ author) author) authors))) ++ "</ul>"))
+              html (T.pack (HTML.renderPage "<h1>Authors</h1><ul>" ++ (HTML.ul (reverse (map (\author -> HTML.a ("authors/" ++ author) author) authors))) ++ "</ul>"))
 
 -- | detail page of a single author
 authorHtml :: ActionM ()
@@ -62,12 +62,12 @@ authorHtml =  do
               author <- param "author"
               graders <- liftIO (listGraders author)
               gradings <- liftIO (getGradingsForAuthor author)
-              html (T.pack (HTML.createPage ("<h1>Author: " ++ author ++ "</h1>" ++ "<table><tr>" ++ HTML.th ([]:criteria)  ++ buildGraderRows (map getFileName graders) gradings ++ buildMedianRow (calculateMedians (colsToRows gradings)) ++ buildHistogramRow (length graders) (colsToRows gradings) ++ "</table>" )))
+              html (T.pack (HTML.renderPage ("<h1>Author: " ++ author ++ "</h1>" ++ "<table><tr>" ++ HTML.th ([]:criteria)  ++ HTML.buildGraderRows (map getFileName graders) gradings ++ HTML.buildMedianRow (calculateMedians (colsToRows gradings)) ++ HTML.buildHistogramRow (length graders) (colsToRows gradings) ++ "</table>" )))
 
 -- | grading page that displays the form
 gradeFormHtml :: ActionM ()
 gradeFormHtml =   do
-                  html (T.pack (HTML.createPage ("<h1>Grade</h1>" ++ "<form method=\"post\">" ++ (concatMap (\i -> HTML.labeledInput i ++ "<br />") formInputs) ++ "<button type=\"submit\">Send</button></form>")))
+                  html (T.pack (HTML.renderPage ("<h1>Grade</h1>" ++ "<form method=\"post\">" ++ (concatMap (\i -> HTML.labeledInput i ++ "<br />") formInputs) ++ "<button type=\"submit\">Send</button></form>")))
 
 -- | handels the post request sent by the grading form
 gradeFormHandling :: ActionM()
@@ -75,14 +75,16 @@ gradeFormHandling = do
                     -- nap input fields into a list of string, which is more suitable for our needs
                     inputs <- mapM (\p -> param (p :: T.Text) :: ActionM T.Text) (map (\i -> T.pack i) formInputs)
                     let inputList = map(\s -> read $ show $ T.unpack s) inputs
-                    -- get fields that are always the same (Author & Grader)
-                    let author = inputList !! 0
-                    let grader = inputList !! 1
-                    -- get remain fields, which are the grading ints
-                    let gradings = map (\g -> read g) (drop 2 inputList)
-                    liftIO (storeGrading author grader gradings)
-                    -- redirect the user to the overview
-                    redirect "/authors"
+                    -- check if there are values
+                    if any null inputList then html (T.pack (HTML.renderPage "Incomplete input. <a href=\"/\">Beam me up, Scotty!</a>")) else do
+                      -- get fields that are always the same (Author & Grader)
+                      let author = inputList !! 0
+                      let grader = inputList !! 1
+                      -- get remain fields, which are the grading ints
+                      let gradings = map (\g -> read g) (drop 2 inputList)
+                      liftIO (storeGrading author grader gradings)
+                      -- redirect the user to the overview
+                      redirect "/authors"
 
 -- | calls the generation for demo data
 generateDemo :: IO ()
