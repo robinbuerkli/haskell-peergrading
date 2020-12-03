@@ -26,7 +26,7 @@ generateDemoData criteria = do
                             mapM (\a -> generateGradings a criteria) predefAuthors
                             return ()
 
--- | generates gradings for a specfic author. also the list of criteria is passed, to match the list entries
+-- | generates gradings for a specific author. also the list of criteria is passed, to match the list entries
 generateGradings :: String -> [String] -> IO ()
 generateGradings author criteria =  do
                                     mapM (\g -> (storeGraderData author g criteria)) predefGraders

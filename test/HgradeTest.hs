@@ -48,7 +48,7 @@ histoTests = testGroup "Histogram tests"
           histogram [1,0,2,1,1,0] @?= (2,3,1)
   ]
 
--- | testset for the
+-- | testset for the colsToRows function
 c2rTests :: TestTree
 c2rTests = testGroup "ColsToRows tests"
   [ testCase "ColsToRows empty list" $

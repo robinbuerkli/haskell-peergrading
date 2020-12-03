@@ -8,7 +8,7 @@ module Hgrade.ListFunctions where
 
 import Data.List
 
--- | transforms a list so that the entires of a list get mapped to a set of the same associated values. or just transforms columns to rows...
+-- | transforms a list so that the entries of a list get mapped to a set of the same associated values. or just transforms columns to rows...
 colsToRows :: [[a]] -> [[a]]
 colsToRows [] = []
 colsToRows ([]:_) = []

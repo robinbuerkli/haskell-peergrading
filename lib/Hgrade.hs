@@ -19,7 +19,7 @@ import qualified  Hgrade.HTMLBuilder as HTML
 import            Hgrade.Demo as DEMO
 import            System.Environment
 
--- | list of the criteria, which the authors get graded by
+-- | list of the criteria, for which the authors get graded by
 criteria :: [String]
 criteria = ["N1", "N2", "F1", "F2", "F3"]
 
@@ -69,10 +69,10 @@ gradeFormHtml :: ActionM ()
 gradeFormHtml =   do
                   html (T.pack (HTML.renderPage ("<h1>Grade</h1>" ++ "<form method=\"post\">" ++ (concatMap (\i -> HTML.labeledInput i ++ "<br />") formInputs) ++ "<button type=\"submit\">Send</button></form>")))
 
--- | handels the post request sent by the grading form
+-- | handles the post request sent by the grading form
 gradeFormHandling :: ActionM()
 gradeFormHandling = do
-                    -- nap input fields into a list of string, which is more suitable for our needs
+                    -- map input fields into a list of string, which is more suitable for our needs
                     inputs <- mapM (\p -> param (p :: T.Text) :: ActionM T.Text) (map (\i -> T.pack i) formInputs)
                     let inputList = map(\s -> read $ show $ T.unpack s) inputs
                     -- check if there are values

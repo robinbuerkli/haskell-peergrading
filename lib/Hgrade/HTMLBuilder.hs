@@ -42,7 +42,7 @@ tr [] = ""
 tr [s] = "<tr>" ++ s ++ "</tr>"
 tr (s:ss) = "<tr>" ++ s ++ "</tr>" ++ tr ss
 
--- | transforms a list of showable values into table columns
+-- | transforms a list of "showable" values into table columns
 td :: Show a => [a] -> String
 td[] = ""
 td [s] = "<td>" ++ (show s) ++ "</td>"
