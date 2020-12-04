@@ -78,8 +78,8 @@ li :: String -> String
 li content = createElement "li" content
 
 -- | creates a div with the given parameters
-div :: [String] -> String -> String
-div params content = createElementWithParams "div" params content
+divEl :: [String] -> String -> String
+divEl params content = createElementWithParams "div" params content
 
 -- | creates an anchor element with the given parameters
 a :: String -> String -> String
