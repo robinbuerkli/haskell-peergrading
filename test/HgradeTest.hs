@@ -31,6 +31,9 @@ medianTests = testGroup "Median tests"
     testCase "median odd list" $
           median [1,0,3] @?= 1.0,
 
+    testCase "median double result" $
+          median [1,1,2,2] @?= 1.5,
+
     testCase "median list of zeros" $
           median [0,0] @?= 0
   ]
