@@ -113,6 +113,10 @@ paramTd params content = createElementWithParams "td" params content
 textInput :: String -> String
 textInput name = createElementWithParams "input" [concat ["name='", name, "'"], "type='text'"] ""
 
+-- | creates a number input field
+numberInput :: String -> String
+numberInput name = createElementWithParams "input" [concat ["name='", name, "'"], "type='number'", "min='0'", "max='2'"] ""
+
 -- | creates a label
 label :: String -> String
 label name = createElementWithParams "label" [concat ["for='", name, "'"]] (concat [name, ":"])

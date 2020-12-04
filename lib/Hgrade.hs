@@ -23,9 +23,13 @@ import            System.Environment
 criteria :: [String]
 criteria = ["N1", "N2", "F1", "F2", "F3"]
 
+-- | list of the grading metadata
+formMeta :: [String]
+formMeta = ["Author", "Grader"]
+
 -- | list of the total form inputs on the grading page
 formInputs :: [String]
-formInputs = concat [["Author", "Grader"], criteria]
+formInputs = concat [formMeta, criteria]
 
 -- | main IO action, which checks if the demo argument is passed and starts the scotty webserver
 main :: IO ()
@@ -93,7 +97,8 @@ gradeFormHtml =   do
                               page [
                                 h1 "Grade",
                                 (form ["method='post'"]
-                                  (concat [(concatMap (\i -> divEl ["class='formInput']"] (labeledInput i)) formInputs),
+                                  (concat [(concatMap (\i -> divEl ["class='formInput']"] (labeledInput i)) formMeta),
+                                  (concatMap (\i -> divEl ["class='formInput']"] (concat [(label i), (numberInput i)])) criteria),
                                   (button "Send")]))
                               ]))
 
