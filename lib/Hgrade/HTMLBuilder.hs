@@ -12,17 +12,23 @@ import Hgrade.ListFunctions
 
 -- | class for creating some kind of html dsl, supports [String] and String
 class Html a where
+  -- | creates a simple html element with the passed tag and content
   createElement :: String -> a -> String
+  -- | creates an html element with the passed parameters, tag and content
   createElementWithParams :: String -> [String] -> a -> String
 
 -- | instance for a simple element with a String passed on
 instance Html String where
+  -- | default implementation for all createElement functions
   createElementWithParams tag params content = concat ["<", tag, concatMap (\s -> concat [" ", s]) params , ">", content, "</", tag, ">"]
+  -- | create a simple tag (pass an empty list)
   createElement tag content = createElementWithParams tag [] content
 
 -- | instance for a [String] array, for elements that contain more elements in them
 instance Html [String] where
+  -- | create an html tag with a string list of parameters
   createElementWithParams tag params content = createElementWithParams tag params (concat content)
+  -- | create a simple tag (pass an empty list)
   createElement tag content = createElementWithParams tag [] content
 
 -- | wraps the passed string into a standard html, so that every page metadata is the same

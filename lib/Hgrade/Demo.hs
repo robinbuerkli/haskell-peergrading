@@ -22,14 +22,14 @@ predefGraders = ["grader1", "grader2", "grader3", "grader4"]
 -- takes the list of criteria, so that the matching number of grading entries will be generated
 generateDemoData :: [String] -> IO ()
 generateDemoData criteria = do
-                            mapM (\a -> createAuthor a) predefAuthors
-                            mapM (\a -> generateGradings a criteria) predefAuthors
+                            _ <- mapM (\a -> createAuthor a) predefAuthors
+                            _ <- mapM (\a -> generateGradings a criteria) predefAuthors
                             return ()
 
 -- | generates gradings for a specific author. also the list of criteria is passed, to match the list entries
 generateGradings :: String -> [String] -> IO ()
 generateGradings author criteria =  do
-                                    mapM (\g -> (storeGraderData author g criteria)) predefGraders
+                                    _ <- mapM (\g -> (storeGraderData author g criteria)) predefGraders
                                     return ()
 
 -- | store grading data for a specific author and grader. takes criteria as well
