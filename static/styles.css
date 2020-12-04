@@ -1,31 +1,8 @@
-body {
-    font-family: "Verdana", sans-serif;
-}
-
-table, th, td {
-    border: 1px solid black;
-    border-collapse: collapse;
-}
-
 table.histo td {
     height: 20px;
     width: 20px;
 }
 
-table.histo td.white {
-    background-color: white;
-}
-
-table.histo td.black {
-    background-color: black;
-}
-
-label {
-    display: block;
-    font-weight: bold;
-    margin: 0 0 2px 0;
-}
-
-.formInput {
-    margin: 0 0 5px 0;
+.median-row {
+    border-top: 2px solid #6c757d;
 }

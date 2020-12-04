@@ -30,10 +30,13 @@ page :: [String] -> String
 page content = htmlRoot [
                          mHead [
                             pageTitle "fprog - Peergrading in Haskell",
-                            link ["rel='stylesheet'", "type='text/css'", "href='/static/styles.css'"]
+                            link ["rel='stylesheet'", "type='text/css'", "href='/static/styles.css'"],
+                            link ["rel='stylesheet'", "type='text/css'", "href='/static/bootstrap.min.css'"]
                          ],
                          body [
-                            concat content
+                            divEl ["class='container'"] (
+                              concat content
+                            )
                          ]
                        ]
 
@@ -81,9 +84,17 @@ li content = createElement "li" content
 divEl :: [String] -> String -> String
 divEl params content = createElementWithParams "div" params content
 
--- | creates an anchor element with the given parameters
+-- | creates a horizontal line
+hr :: String
+hr = createElement "hr" ""
+
+-- | creates an anchor element
 a :: String -> String -> String
 a href t = createElementWithParams "a" [concat ["href='", href, "'"]] t
+
+-- | creates an anchor element with the given parameters
+paramA :: [String] -> String -> String -> String
+paramA params href t = createElementWithParams "a" ["href='", href, "'", concat params] t
 
 -- | creates a table with the given parameters
 table :: [String] -> String -> String
@@ -93,6 +104,10 @@ table params content = createElementWithParams "table" params content
 tr :: String -> String
 tr content = createElement "tr" content
 
+-- | creates a table row with the given parameters
+paramTr :: [String] -> String -> String
+paramTr params content = createElementWithParams "tr" params content
+
 -- | creates a table header column
 th :: String -> String
 th content = createElement "th" content
@@ -101,64 +116,60 @@ th content = createElement "th" content
 td :: String -> String
 td content = createElement "td" content
 
--- | creates a form element with the given parameters
-form :: [String] -> String -> String
-form params content = createElementWithParams "form" params content
-
 -- | creates a table column with the given parameters (used for the histogram)
 paramTd :: [String] -> String -> String
 paramTd params content = createElementWithParams "td" params content
 
+-- | creates a form element with the given parameters
+form :: [String] -> String -> String
+form params content = createElementWithParams "form" params content
+
 -- | creates a text input field
 textInput :: String -> String
-textInput name = createElementWithParams "input" [concat ["name='", name, "'"], "type='text'"] ""
+textInput name = createElementWithParams "input" [concat ["name='", name, "'"], concat ["id='", name, "'"], "type='text'", "class='form-control'", "required='required'"] ""
 
 -- | creates a number input field
 numberInput :: String -> String
-numberInput name = createElementWithParams "input" [concat ["name='", name, "'"], "type='number'", "min='0'", "max='2'"] ""
+numberInput name = createElementWithParams "input" [concat ["name='", name, "'"], concat ["id='", name, "'"], "type='number'", "min='0'", "max='2'", "class='form-control'", "required='required'"] ""
 
 -- | creates a label
 label :: String -> String
-label name = createElementWithParams "label" [concat ["for='", name, "'"]] (concat [name, ":"])
+label name = createElementWithParams "label" [concat ["for='", name, "'"], "class='col-sm-2 col-form-label'"] name
 
 -- | creates an input field with a corresponding label
 labeledInput :: String -> String
-labeledInput name = concat [label name, textInput name]
+labeledInput name = concat [label name, divEl ["class='col-sm-10'"] (textInput name)]
 
 -- | creates a submit button labeled with the given name
 button :: String -> String
-button name = createElementWithParams "button" ["type='submit'"] name
+button name = createElementWithParams "button" ["type='submit'", "class='btn btn-dark'"] name
 
 -- | build rows with the grader's data
 buildGraderRows :: [String] -> [[Int]] -> String
 buildGraderRows [] _ = ""
 buildGraderRows (_:_) [] = ""
-buildGraderRows (x:xs) (g: gs) = tr (concat [(td x), (concatMap (\grading -> td (show grading)) g)]) ++ buildGraderRows xs gs
+buildGraderRows (x:xs) (g: gs) = tr (concat [(th x), (concatMap (\grading -> td (show grading)) g)]) ++ buildGraderRows xs gs
 
 -- | build the table row for medians
 buildMedianRow :: [Double] -> String
-buildMedianRow xs = tr (concat [(td "Median"), (concatMap(\d -> td (show d)) xs)])
-
+buildMedianRow xs = paramTr ["class='median-row'"] (concat [(th "Median"), (concatMap(\d -> td (show d)) xs)])
 
 -- | build the table row for histograms
 buildHistogramRow :: Int -> [[Int]]  -> String
-buildHistogramRow n xs = tr (concat [(td "Histograms"), (concatMap(\d -> td (buildHistogramTable n d)) xs)])
-
+buildHistogramRow n xs = tr (concat [(th "Histograms"), (concatMap(\d -> td (buildHistogramTable n d)) xs)])
 
 -- | build a single histogram
 buildHistogramTable :: Int -> [Int] -> String
 buildHistogramTable _ [] = ""
 buildHistogramTable n xs = table ["class='histo']"] (buildHistogramRows n (histogram xs))
 
-
 -- | build a single row within the histogram table
 buildHistogramRows :: Int -> (Int, Int, Int) -> String
 buildHistogramRows 0 _ = ""
 buildHistogramRows n (first, second, third) = tr (concat [(tdColor n first), (tdColor n second), (tdColor n third)]) ++ (buildHistogramRows (n - 1) (first, second, third))
 
-
 -- | print a white or black table column by comparing the two input values
 tdColor :: Int -> Int -> String
 tdColor x y
-        | x > y = paramTd ["class='white'"] ""
-        | otherwise = paramTd ["class='black'"] ""
+        | x > y = paramTd ["class='bg-light'"] ""
+        | otherwise = paramTd ["class='bg-dark'"] ""

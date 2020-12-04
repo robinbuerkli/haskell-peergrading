@@ -13,6 +13,7 @@ import            Web.Scotty
 import            Control.Monad.IO.Class (liftIO)
 import            Network.Wai.Middleware.RequestLogger ( logStdoutDev )
 import qualified  Data.Text.Lazy as T
+import            Data.List
 import            Hgrade.FSActions
 import            Hgrade.ListFunctions
 import            Hgrade.HTMLBuilder
@@ -49,6 +50,7 @@ main = do
 
     -- static resources
     get "/static/styles.css" $ file "static/styles.css"
+    get "/static/bootstrap.min.css" $ file "static/bootstrap.min.css"
 
 -- | homepage, which you'll get with a get request to the root
 indexHtml :: ActionM ()
@@ -56,23 +58,25 @@ indexHtml = html (T.pack (
                         page [
                           h1 "Hgrade",
                           h2 "Peergrading in Haskell",
-                          divEl ["id='links']"] (
-                            ul (concat [
-                              li (a "/authors" "Grading Overview"),
-                              li (a "/grade" "Submit Grading")
+                          hr,
+                          divEl ["class='list-group'"] (concat [
+                              paramA ["class='list-group-item list-group-item-action'"] "/authors" "Grading Overview",
+                              paramA ["class='list-group-item list-group-item-action'"] "/grade" "Submit Grading"
                             ])
-                          )
                         ]))
 
 -- | overview of authors
 authorOverviewHtml :: ActionM ()
-
 authorOverviewHtml = do
               authors <- liftIO listAuthors
               html (T.pack (
                         page [
                           h1 "Authors",
-                           (ul (concatMap(\author -> li author) (map (\author -> a ("authors/" ++ author) author) (reverse authors))))
+                          hr,
+                          divEl ["class='list-group'"]
+                            (concatMap (\author -> paramA ["class='list-group-item list-group-item-action'"] ("authors/" ++ author) author) (sort authors)),
+                          hr,
+                          a "/" "« Return to homepage"
                          ]))
 
 -- | detail page of a single author
@@ -84,10 +88,15 @@ authorHtml =  do
               html (T.pack (
                           page [
                             h1 (concat ["Author: ", author]),
-                             table [] (concat [(tr (concatMap (\c -> th c) ("":criteria))),
-                              (buildGraderRows (map getFileName graders) gradings),
-                              (buildMedianRow (calculateMedians (colsToRows gradings))),
-                              (buildHistogramRow (length graders) (colsToRows gradings))])
+                              hr,
+                              divEl ["class='table-responsive'"] (
+                                table ["class='table table-bordered table-striped'"] (concat [(tr (concatMap (\c -> th c) ("":criteria))),
+                                  (buildGraderRows (map getFileName graders) gradings),
+                                  (buildMedianRow (calculateMedians (colsToRows gradings))),
+                                  (buildHistogramRow (length graders) (colsToRows gradings))])
+                                ),
+                              hr,
+                              a "/authors" "« Return to author overview"
                           ]))
 
 -- | grading page that displays the form
@@ -96,10 +105,14 @@ gradeFormHtml =   do
                   html (T.pack (
                               page [
                                 h1 "Grade",
+                                hr,
                                 (form ["method='post'"]
-                                  (concat [(concatMap (\i -> divEl ["class='formInput']"] (labeledInput i)) formMeta),
-                                  (concatMap (\i -> divEl ["class='formInput']"] (concat [(label i), (numberInput i)])) criteria),
-                                  (button "Send")]))
+                                  (concat [(concatMap (\i -> divEl ["class='form-group row'"] (labeledInput i)) formMeta),
+                                  (concatMap (\i -> divEl ["class='form-group row'"] (concat [(label i), divEl ["class='col-sm-10'"] (numberInput i)])) criteria),
+                                  hr,
+                                  a "/" "« Return to homepage",
+                                  divEl ["class='float-right'"] (button "Send")])
+                                )
                               ]))
 
 -- | handles the post request sent by the grading form
@@ -109,7 +122,7 @@ gradeFormHandling = do
                     inputs <- mapM (\i -> param (i :: T.Text) :: ActionM T.Text) (map (\i -> T.pack i) formInputs)
                     let inputList = map(\s -> read $ show $ T.unpack s) inputs
                     -- check if there are values
-                    if any null inputList then html (T.pack (page [p "Incomplete input.", a "/" "Beam me up, Scotty!"])) else do
+                    if any null inputList then html (T.pack (page [h1 "Oh no!", hr, p "Incomplete input.", a "/" "Beam me up, Scotty!"])) else do
                       -- get fields that are always the same (Author & Grader)
                       let author = inputList !! 0
                       let grader = inputList !! 1
